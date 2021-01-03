@@ -1,0 +1,17 @@
+﻿<Application x:Class="buLocate.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:buLocate"
+             xmlns:bing="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+             StartupUri="MainWindow.xaml"
+             xmlns:ui="http://schemas.modernwpf.com/2019">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemeResources />
+                <ui:XamlControlsResources />
+            </ResourceDictionary.MergedDictionaries>
+            <bing:ApplicationIdCredentialsProvider x:Key="MyCredentials" ApplicationId="AkighsMVKBS9_moe1f5jUMph7JzLnYAcKhUCpiz5UwutaaQW7iCmQNMmKnomLqJ9" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
