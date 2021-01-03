@@ -1,4 +1,5 @@
 ﻿using BingMapsRESTToolkit;
+using buLocate.UserHandler;
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;

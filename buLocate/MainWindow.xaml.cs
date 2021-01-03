@@ -1,4 +1,5 @@
 ﻿using buLocate.NetworkingHandler;
+using buLocate.UserHandler;
 using EasyNetQ;
 using Microsoft.Maps.MapControl.WPF;
 using System;

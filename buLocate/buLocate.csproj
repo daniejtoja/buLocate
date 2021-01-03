@@ -91,7 +91,7 @@
     <Compile Include="NetworkingHandler\Publisher.cs" />
     <Compile Include="NetworkingHandler\Subscriber.cs" />
     <Compile Include="NetworkingHandler\UserInfo.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="UserHandler\User.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
