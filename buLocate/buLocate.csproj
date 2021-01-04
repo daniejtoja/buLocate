@@ -132,9 +132,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="doge.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="icons\01-bird-icon.png" />
     <Resource Include="icons\01-bull-icon.png" />
     <Resource Include="icons\01-cat-icon.png" />
