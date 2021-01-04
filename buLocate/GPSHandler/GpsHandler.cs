@@ -1,4 +1,5 @@
-﻿using Microsoft.Maps.MapControl.WPF;
+﻿using buLocate.UserHandler;
+using Microsoft.Maps.MapControl.WPF;
 using System.Threading.Tasks;
 
 namespace buLocate.GPSHandler
