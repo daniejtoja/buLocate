@@ -85,7 +85,7 @@ namespace buLocate
                     return;
                 if (!IsAnimalPinPlaced)
                 {
-                    MessageBox.Show("Pin not placed. Please place a pin on a map before connecting.", "Pin not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Pin not placed. Please place a pin on a map before connecting. To place a pin, double click a point on the map.", "Pin not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
