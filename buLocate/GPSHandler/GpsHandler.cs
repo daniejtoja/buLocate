@@ -43,6 +43,7 @@ namespace buLocate.GPSHandler
             }
             MainWindow.MainWindowReference.mainMap.Children.Remove(MainWindow.MainWindowReference.DestinationPin);
             MainWindow.MainWindowReference.IsGPSBeingSimulated = false;
+            MainWindow.MainWindowReference.mainMap.Children.Remove(MainWindow.ReceivedRoute);
 
         }
     }
