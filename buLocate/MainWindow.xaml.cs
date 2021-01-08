@@ -302,5 +302,10 @@ namespace buLocate
             return true;
 
         }
+
+        private void SelectUsernameBox(object sender, TextChangedEventArgs e)
+        {
+            usernameBox.Clear();
+        }
     }
 }
