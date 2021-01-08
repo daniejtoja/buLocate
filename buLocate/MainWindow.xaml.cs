@@ -211,11 +211,14 @@ namespace buLocate
             Point mousePos = e.GetPosition((IInputElement)sender);
             Location pinLoc = mainMap.ViewportPointToLocation(mousePos);
 
+            if (usernameBox.Text.Contains(" "))
+                usernameBox.Text = usernameBox.Text.ToString().Replace(@" ", @"_");
+
             MyPin = new Pushpin
             {
                 Location = pinLoc,
                 Tag = ((ComboBoxItem)typeBox.SelectedItem).Name.ToString(),
-                Name = String.Format("{0}_{1}_{2}", usernameBox.Text, DateTime.Now.GetHashCode(), Guid.NewGuid().ToString().Replace(@"-",@"_")),
+                Name = String.Format("{0}_{1}_{2}", usernameBox.Text, DateTime.Now.Millisecond, Guid.NewGuid().ToString().Replace(@"-",@"_")),
                 Template = (ControlTemplate)FindResource("PushpinControlTemplate")
             };
             mainMap.Children.Add(MyPin);
