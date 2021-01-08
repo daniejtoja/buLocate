@@ -10,21 +10,21 @@ namespace buLocate.NetworkingHandler
         /// Logika przetwarzania wiadomości z Rabbita
         /// </summary>
         /// <param name="user">Wiadomość z Rabbita dotycząca użytkownika</param>
-        public static void handle(UserInfo user)
+        public static void Handle(UserInfo user)
         {
 
-            if (user.isNew)
-                HandleMap.addUserPin(user);
-            else if (user.isUpdated)
+            if (user.IsNew)
+                HandleMap.AddUserPin(user);
+            else if (user.IsUpdated)
             {
-                if (MainWindow.mainWindowReference.collectionOfUsers.Any(item => item.userInfo.nickname == user.nickname))
-                    HandleMap.updateUserPin(user);
+                if (MainWindow.MainWindowReference.CollectionOfUsers.Any(item => item.UserInfo.Nickname == user.Nickname))
+                    HandleMap.UpdateUserPin(user);
                 else
-                    HandleMap.addUserPin(user);
+                    HandleMap.AddUserPin(user);
             }
 
-            else if (user.isLeaving)
-                HandleMap.deleteUserPin(user);
+            else if (user.IsLeaving)
+                HandleMap.DeleteUserPin(user);
 
 
 

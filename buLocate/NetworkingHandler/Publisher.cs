@@ -9,9 +9,9 @@ namespace buLocate.NetworkingHandler
         /// Asynchroniczne wysyłanie do kolejki.
         /// </summary>
         /// <param name="userInfo">To co chcemy wysłać</param>
-        public static void publish(UserInfo userInfo)
+        public static void Publish(UserInfo userInfo)
         {
-            MainWindow.rabbitBus.PubSub.PublishAsync(userInfo, "NewLocations");
+            MainWindow.RabbitBus.PubSub.PublishAsync(userInfo, "NewLocations");
         }
     }
 }

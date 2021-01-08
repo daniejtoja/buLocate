@@ -7,12 +7,12 @@ namespace buLocate.NetworkingHandler
         /// <summary>
         /// Usuwamy użytkowników, którzy od 5 minut nie zmienili swojego położenia.
         /// </summary>
-        public static void deleteAfks()
+        public static void DeleteAfks()
         {
-            foreach (var item in MainWindow.mainWindowReference.collectionOfUsers)
+            foreach (var item in MainWindow.MainWindowReference.CollectionOfUsers)
             {
-                if (TimeSpan.Compare(DateTime.Now.Subtract(item.userInfo.lastActivityTime), TimeSpan.FromMinutes(5)) > 1)
-                    HandleMap.deleteUserPin(item.userInfo);
+                if (TimeSpan.Compare(DateTime.Now.Subtract(item.UserInfo.LastActivityTime), TimeSpan.FromMinutes(5)) > 1)
+                    HandleMap.DeleteUserPin(item.UserInfo);
             }
         }
 

@@ -12,8 +12,8 @@ namespace buLocate.UserHandler
     /// </summary>
     public class User
     {
-        public buLocate.NetworkingHandler.UserInfo userInfo { get; set; }
-        public Microsoft.Maps.MapControl.WPF.Pushpin userPin { get; set; }
+        public buLocate.NetworkingHandler.UserInfo UserInfo { get; set; }
+        public Microsoft.Maps.MapControl.WPF.Pushpin UserPin { get; set; }
 
     }
 }

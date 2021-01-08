@@ -57,17 +57,17 @@ namespace buLocate.NetworkingHandler
                     if (routePath[i].Length >= 2)
                         locs.Add(new Microsoft.Maps.MapControl.WPF.Location(routePath[i][0], routePath[i][1]));
 
-                MainWindow.waypoints = new LocationCollection();
-                MainWindow.waypoints = locs;
+                MainWindow.Waypoints = new LocationCollection();
+                MainWindow.Waypoints = locs;
 
-                MainWindow.receivedRoute = new MapPolyline()
+                MainWindow.ReceivedRoute = new MapPolyline()
                 {
                     Locations = locs,
                     Stroke = new SolidColorBrush(Colors.Black),
                     StrokeThickness = 2
                 };
 
-                map.Children.Add(MainWindow.receivedRoute);
+                map.Children.Add(MainWindow.ReceivedRoute);
 
 
             }
@@ -81,27 +81,27 @@ namespace buLocate.NetworkingHandler
         /// Ignorujemy siebie
         /// </summary>
         /// <param name="user">Użytkownik, którego chcemy dodać</param>
-        public static void addUserPin(UserInfo user)
+        public static void AddUserPin(UserInfo user)
         {
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                if (MainWindow.mainWindowReference.infoOfMe.userInfo.nickname.Equals(user.nickname)) return;
+                if (MainWindow.MainWindowReference.InfoOfMe.UserInfo.Nickname.Equals(user.Nickname)) return;
 
                 Pushpin temporary = new Pushpin
                 {
-                    Location = user.location,
-                    Tag = user.animalType,
-                    Name = user.nickname,
-                    Template = MainWindow.mainWindowReference.pinTemplate
+                    Location = user.UserLocation,
+                    Tag = user.AnimalType,
+                    Name = user.Nickname,
+                    Template = MainWindow.MainWindowReference.PinTemplate
                 };
 
-                MainWindow.mainWindowReference.collectionOfUsers.Add(new User()
+                MainWindow.MainWindowReference.CollectionOfUsers.Add(new User()
                 {
-                    userInfo = user,
-                    userPin = temporary
+                    UserInfo = user,
+                    UserPin = temporary
                 });
 
-                MainWindow.mainWindowReference.mainMap.Children.Add(temporary);
+                MainWindow.MainWindowReference.mainMap.Children.Add(temporary);
             }));
 
 
@@ -112,19 +112,19 @@ namespace buLocate.NetworkingHandler
         /// Ignorujemy siebie
         /// </summary>
         /// <param name="user">Użytkownik, którego chcemy edytować</param>
-        public static void updateUserPin(UserInfo user)
+        public static void UpdateUserPin(UserInfo user)
         {
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                if (MainWindow.mainWindowReference.infoOfMe.userInfo.nickname.Equals(user.nickname)) return;
+                if (MainWindow.MainWindowReference.InfoOfMe.UserInfo.Nickname.Equals(user.Nickname)) return;
 
-                foreach (var usr in MainWindow.mainWindowReference.collectionOfUsers)
+                foreach (var usr in MainWindow.MainWindowReference.CollectionOfUsers)
                 {
-                    if (usr.userInfo.nickname == user.nickname)
+                    if (usr.UserInfo.Nickname == user.Nickname)
                     {
-                        usr.userInfo.location = user.location;
-                        usr.userPin.Location = user.location;
-                        usr.userInfo.lastActivityTime = System.DateTime.Now;
+                        usr.UserInfo.UserLocation = user.UserLocation;
+                        usr.UserPin.Location = user.UserLocation;
+                        usr.UserInfo.LastActivityTime = System.DateTime.Now;
                     }
 
                 }
@@ -139,23 +139,23 @@ namespace buLocate.NetworkingHandler
         /// </summary>
         /// <param name="user"></param>
 
-        public static void deleteUserPin(UserInfo user)
+        public static void DeleteUserPin(UserInfo user)
         {
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 int foundIndex = -1;
-                for (int i = 0; i < MainWindow.mainWindowReference.collectionOfUsers.Count; ++i)
+                for (int i = 0; i < MainWindow.MainWindowReference.CollectionOfUsers.Count; ++i)
                 {
-                    if (MainWindow.mainWindowReference.collectionOfUsers.ElementAt(i).userInfo.nickname.Equals(user.nickname))
+                    if (MainWindow.MainWindowReference.CollectionOfUsers.ElementAt(i).UserInfo.Nickname.Equals(user.Nickname))
                     {
                         foundIndex = i;
                         break;
                     }
                 }
                 if (foundIndex == -1) return;
-                MainWindow.mainWindowReference.mainMap.Children.Remove(MainWindow.mainWindowReference.collectionOfUsers.ElementAt(foundIndex).userPin);
-                MainWindow.mainWindowReference.collectionOfUsers.Remove(MainWindow.mainWindowReference.collectionOfUsers.ElementAt(foundIndex));
+                MainWindow.MainWindowReference.mainMap.Children.Remove(MainWindow.MainWindowReference.CollectionOfUsers.ElementAt(foundIndex).UserPin);
+                MainWindow.MainWindowReference.CollectionOfUsers.Remove(MainWindow.MainWindowReference.CollectionOfUsers.ElementAt(foundIndex));
 
             }));
 

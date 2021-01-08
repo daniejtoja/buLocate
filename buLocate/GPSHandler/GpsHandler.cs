@@ -13,33 +13,36 @@ namespace buLocate.GPSHandler
         /// po dotarciu na miejsce usuwamy pin.
         /// </summary>
         /// <param name="user"></param>
-        public static async Task simulateRouteAsync(User user)
+        public static async Task SimulateRouteAsync(User user)
         {
             
-            if (MainWindow.waypoints == null) return;
+            
+            if (MainWindow.Waypoints == null) return;
 
-            foreach (var loc in MainWindow.waypoints)
+            MainWindow.MainWindowReference.IsGPSBeingSimulated = true;
+
+            foreach (var loc in MainWindow.Waypoints)
             {
                 await Task.Delay(1000);
-                user.userPin.Location = loc;
-                user.userInfo.isNew = false;
-                user.userInfo.isLeaving = false;
-                user.userInfo.isUpdated = true;
-                user.userInfo.location = loc;
-                user.userInfo.lastActivityTime = System.DateTime.Now;
-                MainWindow.mainWindowReference.myPin.Location = loc;
+                user.UserPin.Location = loc;
+                user.UserInfo.IsNew = false;
+                user.UserInfo.IsLeaving = false;
+                user.UserInfo.IsUpdated = true;
+                user.UserInfo.UserLocation = loc;
+                user.UserInfo.LastActivityTime = System.DateTime.Now;
+                MainWindow.MainWindowReference.MyPin.Location = loc;
 
-                NetworkingHandler.Publisher.publish(user.userInfo);
+                NetworkingHandler.Publisher.Publish(user.UserInfo);
 
 
-                MapPolyline temporaryLine = MainWindow.receivedRoute;
+                MapPolyline temporaryLine = MainWindow.ReceivedRoute;
                 //Linia kodu powyżej pozwala na upiększenie drogi. Nasza linia nie mryga:-)
-                await NetworkingHandler.HandleMap.GetRoute(user.userInfo.location, MainWindow.mainWindowReference.destinationPin.Location, "AkighsMVKBS9_moe1f5jUMph7JzLnYAcKhUCpiz5UwutaaQW7iCmQNMmKnomLqJ9", MainWindow.mainWindowReference.mainMap);
-                MainWindow.mainWindowReference.mainMap.Children.Remove(temporaryLine);
+                await NetworkingHandler.HandleMap.GetRoute(user.UserInfo.UserLocation, MainWindow.MainWindowReference.DestinationPin.Location, "AkighsMVKBS9_moe1f5jUMph7JzLnYAcKhUCpiz5UwutaaQW7iCmQNMmKnomLqJ9", MainWindow.MainWindowReference.mainMap);
+                MainWindow.MainWindowReference.mainMap.Children.Remove(temporaryLine);
 
             }
-            MainWindow.mainWindowReference.mainMap.Children.Remove(MainWindow.mainWindowReference.destinationPin);
-
+            MainWindow.MainWindowReference.mainMap.Children.Remove(MainWindow.MainWindowReference.DestinationPin);
+            MainWindow.MainWindowReference.IsGPSBeingSimulated = false;
 
         }
     }

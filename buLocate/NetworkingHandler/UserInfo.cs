@@ -13,12 +13,12 @@ namespace buLocate.NetworkingHandler
     /// </summary>
     public class UserInfo
     {
-        public string nickname { get; set; }
-        public string animalType { get; set; }
-        public Location location { get; set; }
-        public System.DateTime lastActivityTime { get; set; }
-        public bool isNew { get; set; }
-        public bool isUpdated { get; set; }
-        public bool isLeaving { get; set; }
+        public string Nickname { get; set; }
+        public string AnimalType { get; set; }
+        public Location UserLocation { get; set; }
+        public System.DateTime LastActivityTime { get; set; }
+        public bool IsNew { get; set; }
+        public bool IsUpdated { get; set; }
+        public bool IsLeaving { get; set; }
     }
 }

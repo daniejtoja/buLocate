@@ -33,21 +33,24 @@ namespace buLocate
         /// 11. waypoints - punkty po drodze - ułatwia symulacje danych GPS
         /// 12. rabbitBus - Szyna wysyłająca i odbierająca dane z rabbita.
         /// 13. afkTimer - Timer dla funkcji usuwającej osoby AFK.
+        /// 14. isGPSBeingSimulated - kontrolka do blokady dodawania pinów gdy symulujemy poruszanie się
         /// </summary>
-        public static MainWindow mainWindowReference { get; private set; }
-        private bool isConnected { get; set; } = false;
-        private bool isAnimalPinPlaced { get; set; } = false;
-        private bool isLocationPinPlaced { get; set; } = false;
-        private bool isRouteDisplayed { get; set; } = false;
-        public Pushpin destinationPin { get; private set; } = null;
-        public Pushpin myPin { get; private set; } = null;
-        public User infoOfMe { get; private set; }
-        public static MapPolyline receivedRoute { get; set; } = null;
-        public List<User> collectionOfUsers { get; } = new List<User>();
-        public ControlTemplate pinTemplate { get; private set; }
-        public static LocationCollection waypoints { get; set; }
-        public static IBus rabbitBus { get; set; }
-        private Timer afkTimer { get; set; }
+        public static MainWindow MainWindowReference { get; private set; }
+        private bool IsConnected { get; set; } = false;
+        private bool IsAnimalPinPlaced { get; set; } = false;
+        private bool IsLocationPinPlaced { get; set; } = false;
+        private bool IsRouteDisplayed { get; set; } = false;
+        public Pushpin DestinationPin { get; private set; } = null;
+        public Pushpin MyPin { get; private set; } = null;
+        public User InfoOfMe { get; private set; }
+        public static MapPolyline ReceivedRoute { get; set; } = null;
+        public List<User> CollectionOfUsers { get; } = new List<User>();
+        public ControlTemplate PinTemplate { get; private set; }
+        public static LocationCollection Waypoints { get; set; }
+        public static IBus RabbitBus { get; set; }
+        private Timer AfkTimer { get; set; }
+        public bool IsGPSBeingSimulated { private get; set; } = false;
+        
 
 
         /// <summary>
@@ -61,10 +64,9 @@ namespace buLocate
         public MainWindow()
         {
             InitializeComponent();
-            mainWindowReference = this;
-            pinTemplate = (ControlTemplate)FindResource("PushpinControlTemplate");
-            rabbitBus = RabbitHutch.CreateBus("host=sparrow.rmq.cloudamqp.com;virtualHost=ryrrglkj;username=ryrrglkj;password=XMSeAe8LnWckqsGxlNGNb5ShUEW22HcK");
-
+            MainWindowReference = this;
+            PinTemplate = (ControlTemplate)FindResource("PushpinControlTemplate");
+            RabbitBus = RabbitHutch.CreateBus("host=sparrow.rmq.cloudamqp.com;virtualHost=ryrrglkj;username=ryrrglkj;password=XMSeAe8LnWckqsGxlNGNb5ShUEW22HcK");
         }
 
         /// <summary>
@@ -75,13 +77,13 @@ namespace buLocate
         /// <param name="sender"></param>
         /// <param name="e"></param>
 
-        private void clickConnect(object sender, RoutedEventArgs e)
+        private void ClickConnect(object sender, RoutedEventArgs e)
         {
-            if (!isConnected)
+            if (!IsConnected)
             {
-                if (!checkConditions())
+                if (!CheckConditions())
                     return;
-                if (!isAnimalPinPlaced)
+                if (!IsAnimalPinPlaced)
                 {
                     MessageBox.Show("Pin not placed. Please place a pin on a map before connecting.", "Pin not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -89,22 +91,22 @@ namespace buLocate
 
                 usernameBox.IsEnabled = false;
                 typeBox.IsEnabled = false;
-                isConnected = true;
-                Publisher.publish(infoOfMe.userInfo);
-                Subscriber.subscribe();
+                IsConnected = true;
+                Publisher.Publish(InfoOfMe.UserInfo);
+                Subscriber.Subscribe();
                 connButton.Content = "Disconnect";
-                afkTimer = new System.Threading.Timer(tmr => HandleAFKs.deleteAfks(), null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+                AfkTimer = new System.Threading.Timer(tmr => HandleAFKs.DeleteAfks(), null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
 
             }
             else
             {
                 if (MessageBox.Show("Do you really want to disconnect and exit?", "Should I?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    infoOfMe.userInfo.isLeaving = true;
-                    infoOfMe.userInfo.isNew = false;
-                    infoOfMe.userInfo.isUpdated = false;
-                    Publisher.publish(infoOfMe.userInfo);
-                    rabbitBus.Dispose();
+                    InfoOfMe.UserInfo.IsLeaving = true;
+                    InfoOfMe.UserInfo.IsNew = false;
+                    InfoOfMe.UserInfo.IsUpdated = false;
+                    Publisher.Publish(InfoOfMe.UserInfo);
+                    RabbitBus.Dispose();
                     connButton.Content = "Connect";
                     System.Windows.Application.Current.Shutdown();
                 }
@@ -123,14 +125,14 @@ namespace buLocate
         /// <param name="sender"></param>
         /// <param name="e"></param>
 
-        private void mapDoubleClick(object sender, MouseButtonEventArgs e)
+        private void MapDoubleClick(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
 
-            if (!isConnected)
-                addAnimal(sender, e);
+            if (!IsConnected)
+                AddAnimal(sender, e);
             else
-                addPin(sender, e);
+                AddPin(sender, e);
         }
 
 
@@ -140,24 +142,25 @@ namespace buLocate
         /// <param name="sender"></param>
         /// <param name="e"></param>
 
-        private async void addPin(object sender, MouseButtonEventArgs e)
+        private async void AddPin(object sender, MouseButtonEventArgs e)
         {
+            if (IsGPSBeingSimulated) return;
 
-            if (receivedRoute != null)
+            if (ReceivedRoute != null)
             {
-                mainMap.Children.Remove(receivedRoute);
-                isRouteDisplayed = false;
+                mainMap.Children.Remove(ReceivedRoute);
+                IsRouteDisplayed = false;
             }
 
-            if (isLocationPinPlaced)
+            if (IsLocationPinPlaced)
             {
-                mainMap.Children.Remove(destinationPin);
-                isLocationPinPlaced = false;
+                mainMap.Children.Remove(DestinationPin);
+                IsLocationPinPlaced = false;
             }
-            if (isRouteDisplayed)
+            if (IsRouteDisplayed)
             {
-                mainMap.Children.Remove(receivedRoute);
-                isRouteDisplayed = false;
+                mainMap.Children.Remove(ReceivedRoute);
+                IsRouteDisplayed = false;
             }
 
 
@@ -165,18 +168,17 @@ namespace buLocate
             Point mousePos = e.GetPosition((IInputElement)sender);
             Location pinLoc = mainMap.ViewportPointToLocation(mousePos);
 
-            destinationPin = new Pushpin
+            DestinationPin = new Pushpin
             {
                 Location = pinLoc,
                 Tag = "pin",
                 Template = (ControlTemplate)FindResource("PushpinControlTemplate")
             };
-            mainMap.Children.Add(destinationPin);
-            isLocationPinPlaced = true;
+            mainMap.Children.Add(DestinationPin);
+            IsLocationPinPlaced = true;
 
-            await getDirections();
-
-            await GPSHandler.GpsHandler.simulateRouteAsync(infoOfMe);
+            await GetDirections();
+            await GPSHandler.GpsHandler.SimulateRouteAsync(InfoOfMe);
 
 
 
@@ -187,20 +189,20 @@ namespace buLocate
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addAnimal(object sender, MouseButtonEventArgs e)
+        private void AddAnimal(object sender, MouseButtonEventArgs e)
         {
 
-            if (!checkConditions())
+            if (!CheckConditions())
                 return;
 
 
 
             bool newUser = true;
             bool isBeingUpdated = false;
-            if (isAnimalPinPlaced)
+            if (IsAnimalPinPlaced)
             {
-                mainMap.Children.Remove(myPin);
-                isAnimalPinPlaced = false;
+                mainMap.Children.Remove(MyPin);
+                IsAnimalPinPlaced = false;
                 newUser = false;
                 isBeingUpdated = true;
             }
@@ -209,35 +211,35 @@ namespace buLocate
             Point mousePos = e.GetPosition((IInputElement)sender);
             Location pinLoc = mainMap.ViewportPointToLocation(mousePos);
 
-            myPin = new Pushpin
+            MyPin = new Pushpin
             {
                 Location = pinLoc,
                 Tag = ((ComboBoxItem)typeBox.SelectedItem).Name.ToString(),
-                Name = usernameBox.Text,
+                Name = String.Format("{0}_{1}_{2}", usernameBox.Text, DateTime.Now.GetHashCode(), Guid.NewGuid().ToString().Replace(@"-",@"_")),
                 Template = (ControlTemplate)FindResource("PushpinControlTemplate")
             };
-            mainMap.Children.Add(myPin);
+            mainMap.Children.Add(MyPin);
             UserInfo toAdd = new UserInfo
             {
-                nickname = myPin.Name,
-                animalType = (String)myPin.Tag,
-                location = myPin.Location,
-                lastActivityTime = System.DateTime.Now,
-                isNew = newUser,
-                isUpdated = isBeingUpdated,
-                isLeaving = false
+                Nickname = MyPin.Name,
+                AnimalType = (String)MyPin.Tag,
+                UserLocation = MyPin.Location,
+                LastActivityTime = System.DateTime.Now,
+                IsNew = newUser,
+                IsUpdated = isBeingUpdated,
+                IsLeaving = false
 
             };
 
 
-            infoOfMe = new User
+            InfoOfMe = new User
             {
-                userInfo = toAdd,
-                userPin = myPin
+                UserInfo = toAdd,
+                UserPin = MyPin
             };
-            collectionOfUsers.Add(infoOfMe);
+            CollectionOfUsers.Add(InfoOfMe);
 
-            isAnimalPinPlaced = true;
+            IsAnimalPinPlaced = true;
 
         }
 
@@ -247,14 +249,14 @@ namespace buLocate
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task getDirections()
+        private async Task GetDirections()
         {
-            if (isRouteDisplayed) return;
+            if (IsRouteDisplayed) return;
             else
-                await HandleMap.GetRoute(myPin.Location, destinationPin.Location, "AkighsMVKBS9_moe1f5jUMph7JzLnYAcKhUCpiz5UwutaaQW7iCmQNMmKnomLqJ9", mainMap);
+                await HandleMap.GetRoute(MyPin.Location, DestinationPin.Location, "AkighsMVKBS9_moe1f5jUMph7JzLnYAcKhUCpiz5UwutaaQW7iCmQNMmKnomLqJ9", mainMap);
 
 
-            isRouteDisplayed = true;
+            IsRouteDisplayed = true;
         }
 
         /// <summary>
@@ -265,12 +267,12 @@ namespace buLocate
         /// <param name="e"></param>
         private void CloseApp(object sender, CancelEventArgs e)
         {
-            infoOfMe.userInfo.isLeaving = true;
-            infoOfMe.userInfo.isNew = false;
-            infoOfMe.userInfo.isUpdated = false;
-            NetworkingHandler.Publisher.publish(infoOfMe.userInfo);
-            rabbitBus.Dispose();
-            afkTimer.Dispose();
+            InfoOfMe.UserInfo.IsLeaving = true;
+            InfoOfMe.UserInfo.IsNew = false;
+            InfoOfMe.UserInfo.IsUpdated = false;
+            NetworkingHandler.Publisher.Publish(InfoOfMe.UserInfo);
+            RabbitBus.Dispose();
+            AfkTimer.Dispose();
         }
 
         /// <summary>
@@ -280,7 +282,7 @@ namespace buLocate
         /// 3. Użytkownik wybrał miejsce startowe na mapie
         /// </summary>
         /// <returns></returns>
-        public bool checkConditions()
+        public bool CheckConditions()
         {
             if (usernameBox.Text.Equals("Enter username...") || usernameBox.Text.Equals(""))
             {
